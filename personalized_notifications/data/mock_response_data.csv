@@ -1,0 +1,9 @@
+customernumber,notification_id,response_time,response_type
+123,1,10,opened
+124,2,20,opened
+125,3,30,dismissed
+126,4,40,ignored
+123,5,15,opened
+124,6,25,dismissed
+125,7,35,ignored
+126,8,45,opened

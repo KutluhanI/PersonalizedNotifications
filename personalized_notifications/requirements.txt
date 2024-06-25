@@ -1,0 +1,12 @@
+pandas
+numpy
+requests
+geopy
+jupyter
+tensorflow
+gym
+pyspark
+kafka-python
+apache-airflow
+starburst
+snowflake-connector-python

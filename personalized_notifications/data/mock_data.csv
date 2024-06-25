@@ -1,0 +1,9 @@
+customernumber,event_name,category,subcategory
+123,fx_market,Finance,Forex
+124,borsa,Finance,Stock Market
+125,kredi_basvuru,Finance,Loans
+126,hesap_acma,Banking,Account Opening
+123,borsa,Finance,Stock Market
+124,fx_market,Finance,Forex
+125,hesap_acma,Banking,Account Opening
+126,kredi_basvuru,Finance,Loans
