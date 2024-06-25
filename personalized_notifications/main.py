@@ -1,13 +1,22 @@
+from scripts.mock_data_generator import generate_mock_data, generate_mock_response_data
 from scripts.data_processing import load_and_process_data
 from scripts.category_analysis import analyze_categories
 from scripts.notification_sender import send_notifications
 from scripts.drl_model import DQNAgent, NotificationEnv, load_data
 
 if __name__ == "__main__":
+    num_samples = 10000
+
+    # Mock veri oluşturma
+    generate_mock_data(num_samples)
+    generate_mock_response_data(num_samples)
+
+    # Veri işleme
     df = load_and_process_data()
     top_categories = analyze_categories(df)
     send_notifications(top_categories)
-    
+
+    # Deep Reinforcement Learning
     customer_data, response_data = load_data()
     env = NotificationEnv(customer_data, response_data)
     state_size = env.observation_space.shape[0]

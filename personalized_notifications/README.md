@@ -43,13 +43,15 @@ git clone https://github.com/KutluhanI/Hackathon/
 cd personalized_notifications
 #### 2. Gerekli paketleri yükleyin:
 pip install -r personalized_notifications/requirements.txt
-#### 3. Veri işleme scriptini çalıştırın:
+#### 3. Mock data
+python personalized_notifications/scripts/mock_data_generator.py
+#### 4. Veri işleme scriptini çalıştırın:
 python personalized_notifications/scripts/data_processing.py
-#### 4. Kategori analizi scriptini çalıştırın:
+#### 5. Kategori analizi scriptini çalıştırın:
 python personalized_notifications/scripts/category_analysis.py
-#### 5. Bildirimleri gönderin:
+#### 6. Bildirimleri gönderin:
 python personalized_notifications/scripts/notification_sender.py
-#### 6. Deep Reinforcement Learning modelini çalıştırın:
+#### 7. Deep Reinforcement Learning modelini çalıştırın:
 python personalized_notifications/scripts/drl_model.py
 
 ## Sonuç

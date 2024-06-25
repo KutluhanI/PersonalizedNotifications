@@ -10,3 +10,4 @@ kafka-python
 apache-airflow
 starburst
 snowflake-connector-python
+faker
