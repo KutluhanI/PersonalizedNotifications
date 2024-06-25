@@ -39,18 +39,18 @@ Gerekli Python paketleri (bkz. requirements.txt)
 
 ### Adımlar
 #### 1. Repository'i klonlayın:
-git clone https://github.com/KutluhanI/Hackathon/personalized_notifications/personalized_notifications.git
+git clone https://github.com/KutluhanI/Hackathon/
 cd personalized_notifications
 #### 2. Gerekli paketleri yükleyin:
-pip install -r requirements.txt
+pip install -r personalized_notifications/requirements.txt
 #### 3. Veri işleme scriptini çalıştırın:
-python scripts/data_processing.py
+python personalized_notifications/scripts/data_processing.py
 #### 4. Kategori analizi scriptini çalıştırın:
-python scripts/category_analysis.py
+python personalized_notifications/scripts/category_analysis.py
 #### 5. Bildirimleri gönderin:
-python scripts/notification_sender.py
+python personalized_notifications/scripts/notification_sender.py
 #### 6. Deep Reinforcement Learning modelini çalıştırın:
-python scripts/drl_model.py
+python personalized_notifications/scripts/drl_model.py
 
 ## Sonuç
 Kişiselleştirilmiş Bildirimler Projesi, Fibabanka'nın mobil uygulamasını son derece kişiselleştirilmiş ve etkileşimli bir deneyime dönüştürmek için tasarlanmıştır. İleri düzey veri işleme ve makine öğrenimi tekniklerinden yararlanarak, ilgili bildirimler sunabilir, müşteri memnuniyetini artırabilir ve uygulama kullanımını teşvik edebiliriz. Bu proje, mevcut ihtiyaçları karşılamakla kalmaz, aynı zamanda Deep Reinforcement Learning ile gelecekteki yenilikler için de temel oluşturur.
