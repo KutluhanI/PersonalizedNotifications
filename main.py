@@ -1,8 +1,12 @@
 import pandas as pd
 import numpy as np
+import requests
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Embedding, Flatten, Concatenate, Dense
+
+# Google Maps API Key
+API_KEY = 'AIzaSyAr4jn5mcnSCX4jkLtUJDOffcE90WStvj0'
 
 # Mock data
 user_data = pd.DataFrame({
@@ -78,16 +82,41 @@ labels = np.ones(len(purchase_history))  # Assuming all interactions are positiv
 # Train the model
 model.fit(train_data, labels, epochs=10, batch_size=2)
 
+# Save the model
+model.save('personalized_discount_model.h5')
+
+# Google Maps API integration
+def get_nearby_shops(location, radius=1500):
+    lat, lng = location
+    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={lat},{lng}&radius={radius}&type=store&key={API_KEY}"
+    response = requests.get(url)
+    results = response.json().get('results', [])
+    shops = []
+    for result in results:
+        shop_name = result['name']
+        shop_lat = result['geometry']['location']['lat']
+        shop_lng = result['geometry']['location']['lng']
+        shops.append((shop_name, (shop_lat, shop_lng)))
+    return shops
+
 # Personalized Discount Logic
-def get_personalized_discount(user_id, shop_id):
-    user_idx = user_mapping[user_id]
-    shop_idx = shop_mapping[shop_id]
-    prob = model.predict([np.array([user_idx]), np.array([shop_idx])])
-    discount = '10%' if prob > 0.5 else '5%'
-    return discount
+def get_personalized_discount(user_id, location):
+    nearby_shops = get_nearby_shops(location)
+    discounts = {}
+    for shop_name, shop_location in nearby_shops:
+        shop_id = shop_mapping.get(shop_name)  # Assuming shop_name to shop_id mapping exists
+        if shop_id is not None:
+            user_idx = user_mapping[user_id]
+            shop_idx = shop_mapping[shop_id]
+            prob = model.predict([np.array([user_idx]), np.array([shop_idx])])
+            discount = '10%' if prob > 0.5 else '5%'
+            discounts[shop_name] = discount
+    return discounts
 
 # Example usage
 user_id = 1
-shop_id = 105
-discount = get_personalized_discount(user_id, shop_id)
-print(f"User {user_id} gets a {discount} discount at Shop {shop_id}")
+location = (37.7749, -122.4194)  # User's current location
+discounts = get_personalized_discount(user_id, location)
+print(f"User {user_id} gets the following discounts:")
+for shop_name, discount in discounts.items():
+    print(f"{shop_name}: {discount}")
