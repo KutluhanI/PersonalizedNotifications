@@ -12,8 +12,8 @@ def send_notifications(top_categories):
         send_notification(customer_id, category, subcategory)
 
 if __name__ == "__main__":
-    from mock_category_analysis import analyze_categories
-    from mock_data_processing import load_and_process_data
+    from category_analysis_mock import analyze_categories
+    from data_processing_mock import load_and_process_data
     
     df = load_and_process_data()
     top_categories = analyze_categories(df)

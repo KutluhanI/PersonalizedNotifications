@@ -6,8 +6,8 @@ def analyze_categories(df):
     return category_interest
 
 if __name__ == "__main__":
-    from mock_data_processing import load_and_process_data
+    from data_processing_mock import load_and_process_data
     df = load_and_process_data()
     top_categories = analyze_categories(df)
     print(top_categories)
-    top_categories.to_csv("../results/analysis_results.csv", index=False)
+    top_categories.to_csv("./results/analysis_results.csv", index=False)
