@@ -4,38 +4,62 @@ import requests
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Embedding, Flatten, Concatenate, Dense
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
 
 # Google Maps API Key
 API_KEY = 'AIzaSyAr4jn5mcnSCX4jkLtUJDOffcE90WStvj0'
 
 # Mock data
+num_users = 100
+num_shops = 50
+num_records = 1000
+
 user_data = pd.DataFrame({
-    'user_id': [1, 2, 3, 4, 5],
-    'shop_id': [101, 102, 103, 104, 105],
-    'items_bought': [5, 3, 6, 2, 4],
-    'amount_spent': [100, 150, 200, 80, 120],
-    'location': [(37.7749, -122.4194), (34.0522, -118.2437), (40.7128, -74.0060), (51.5074, -0.1278), (48.8566, 2.3522)]
+    'user_id': np.arange(1, num_users + 1),
+    'age': np.random.randint(18, 70, size=num_users),
+    'gender': np.random.choice(['M', 'F'], size=num_users)
 })
 
 shop_data = pd.DataFrame({
-    'shop_id': [101, 102, 103, 104, 105],
-    'location': [(37.7749, -122.4194), (34.0522, -118.2437), (40.7128, -74.0060), (51.5074, -0.1278), (48.8566, 2.3522)],
-    'category': ['electronics', 'fashion', 'grocery', 'home', 'sports']
+    'shop_id': np.arange(1, num_shops + 1),
+    'category': np.random.choice(['electronics', 'fashion', 'grocery', 'home', 'sports'], size=num_shops)
 })
 
 purchase_history = pd.DataFrame({
-    'user_id': [1, 1, 2, 3, 4, 5, 5, 5],
-    'shop_id': [101, 102, 102, 103, 104, 101, 103, 105],
-    'items_bought': [1, 2, 1, 3, 2, 2, 1, 1],
-    'purchase_date': pd.date_range(start='2023-01-01', periods=8, freq='M')
+    'user_id': np.random.choice(user_data['user_id'], size=num_records),
+    'shop_id': np.random.choice(shop_data['shop_id'], size=num_records),
+    'items_bought': np.random.randint(1, 10, size=num_records),
+    'amount_spent': np.random.randint(5, 500, size=num_records),
+    'purchase_date': pd.date_range(start='2023-01-01', periods=num_records, freq='H')
 })
+
+# Generate negative samples
+negative_samples = pd.DataFrame({
+    'user_id': np.random.choice(user_data['user_id'], size=num_records),
+    'shop_id': np.random.choice(shop_data['shop_id'], size=num_records),
+    'items_bought': 0,
+    'amount_spent': 0,
+    'purchase_date': pd.date_range(start='2023-01-01', periods=num_records, freq='H')
+})
+
+# Combine positive and negative samples
+purchase_history['label'] = 1
+negative_samples['label'] = 0
+full_data = pd.concat([purchase_history, negative_samples])
 
 # Map user_id and shop_id to continuous ranges
 user_mapping = {user_id: i for i, user_id in enumerate(user_data['user_id'].unique())}
 shop_mapping = {shop_id: i for i, shop_id in enumerate(shop_data['shop_id'].unique())}
 
-purchase_history['user_id'] = purchase_history['user_id'].map(user_mapping)
-purchase_history['shop_id'] = purchase_history['shop_id'].map(shop_mapping)
+print("User Mapping:", user_mapping)
+print("Shop Mapping:", shop_mapping)
+
+full_data['user_id'] = full_data['user_id'].map(user_mapping)
+full_data['shop_id'] = full_data['shop_id'].map(shop_mapping)
+
+print("Mapped Full Data:")
+print(full_data.head())
 
 # Neural Collaborative Filtering Model
 
@@ -66,24 +90,31 @@ output = Dense(1, activation='sigmoid')(hidden)
 
 # Model
 model = Model(inputs=[user_input, shop_input], outputs=output)
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['AUC'])
 
 # Summary
 model.summary()
 
 # Training the Model
 # Example training data
-train_data = {
-    'user_input': purchase_history['user_id'].values,
-    'shop_input': purchase_history['shop_id'].values
-}
-labels = np.ones(len(purchase_history))  # Assuming all interactions are positive
+user_input_data = full_data['user_id'].values
+shop_input_data = full_data['shop_id'].values
+labels = full_data['label'].values
+
+# Split data into training and test sets
+user_input_train, user_input_test, shop_input_train, shop_input_test, y_train, y_test = train_test_split(
+    user_input_data, shop_input_data, labels, test_size=0.2, random_state=42)
 
 # Train the model
-model.fit(train_data, labels, epochs=10, batch_size=2)
+model.fit([user_input_train, shop_input_train], y_train, epochs=10, batch_size=32, validation_data=([user_input_test, shop_input_test], y_test))
 
 # Save the model
-model.save('personalized_discount_model.h5')
+model.save('personalized_discount_model.keras')
+
+# Evaluate the model
+y_pred = model.predict([user_input_test, shop_input_test])
+auc_score = roc_auc_score(y_test, y_pred)
+print(f"AUC Score: {auc_score}")
 
 # Google Maps API integration
 def get_nearby_shops(location, radius=1500):
