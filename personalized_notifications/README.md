@@ -39,7 +39,7 @@ Gerekli Python paketleri (bkz. requirements.txt)
 
 ### Adımlar
 #### 1. Repository'i klonlayın:
-git clone https://github.com/yourusername/personalized_notifications.git
+git clone https://github.com/KutluhanI/Hackathon/personalized_notifications/personalized_notifications.git
 cd personalized_notifications
 #### 2. Gerekli paketleri yükleyin:
 pip install -r requirements.txt
